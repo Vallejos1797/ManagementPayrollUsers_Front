@@ -1,6 +1,6 @@
 {
-  "name": "demo8",
-  "version": "8.2.0",
+  "name": "management_payroll_users",
+  "version": "1.0.0",
   "private": true,
   "homepage": "/",
   "dependencies": {
