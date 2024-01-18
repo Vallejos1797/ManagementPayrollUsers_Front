@@ -35,7 +35,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
     avatar: user.avatar || initialUser.avatar,
     role: user.role || initialUser.role,
     position: user.position || initialUser.position,
-    name: user.name || initialUser.name,
+    username: user.username || initialUser.username,
     email: user.email || initialUser.email,
   })
 
@@ -160,18 +160,18 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
               name='name'
               className={clsx(
                 'form-control form-control-solid mb-3 mb-lg-0',
-                {'is-invalid': formik.touched.name && formik.errors.name},
+                {'is-invalid': formik.touched.username && formik.errors.username},
                 {
-                  'is-valid': formik.touched.name && !formik.errors.name,
+                  'is-valid': formik.touched.username && !formik.errors.username,
                 }
               )}
               autoComplete='off'
               disabled={formik.isSubmitting || isUserLoading}
             />
-            {formik.touched.name && formik.errors.name && (
+            {formik.touched.username && formik.errors.username && (
               <div className='fv-plugins-message-container'>
                 <div className='fv-help-block'>
-                  <span role='alert'>{formik.errors.name}</span>
+                  <span role='alert'>{formik.errors.username}</span>
                 </div>
               </div>
             )}

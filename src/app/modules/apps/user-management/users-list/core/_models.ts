@@ -1,11 +1,11 @@
 import {ID, Response} from '../../../../../../_metronic/helpers'
 export type User = {
   id?: ID
-  name?: string
+  username?: string
   avatar?: string
   email?: string
   position?: string
-  role?: string
+  role?: any
   last_login?: string
   two_steps?: boolean
   joined_day?: string
@@ -22,6 +22,6 @@ export const initialUser: User = {
   avatar: 'avatars/300-6.jpg',
   position: 'Art Director',
   role: 'Administrator',
-  name: '',
+  username: '',
   email: '',
 }

@@ -29,17 +29,17 @@ const QueryResponseProvider: FC<WithChildren> = ({children}) => {
   const {
     isFetching,
     refetch,
-    data: response,
+    data,
   } = useQuery(
     `${QUERIES.USERS_LIST}-${query}`,
     () => {
-      return getUsers(query)
+      return getUsers()
     },
     {cacheTime: 0, keepPreviousData: true, refetchOnWindowFocus: false}
   )
 
   return (
-    <QueryResponseContext.Provider value={{isLoading: isFetching, refetch, response, query}}>
+    <QueryResponseContext.Provider value={{isLoading: isFetching, refetch, data, query}}>
       {children}
     </QueryResponseContext.Provider>
   )
@@ -48,12 +48,13 @@ const QueryResponseProvider: FC<WithChildren> = ({children}) => {
 const useQueryResponse = () => useContext(QueryResponseContext)
 
 const useQueryResponseData = () => {
-  const {response} = useQueryResponse()
-  if (!response) {
+  const {data} = useQueryResponse()
+  console.log( "llega",data)
+  if (!data) {
     return []
   }
 
-  return response?.data || []
+  return data || []
 }
 
 const useQueryResponsePagination = () => {
@@ -62,12 +63,12 @@ const useQueryResponsePagination = () => {
     ...initialQueryState,
   }
 
-  const {response} = useQueryResponse()
-  if (!response || !response.payload || !response.payload.pagination) {
+  const {data} = useQueryResponse()
+  if (!data || !data.payload || !data.payload.pagination) {
     return defaultPaginationState
   }
 
-  return response.payload.pagination
+  return data.payload.pagination
 }
 
 const useQueryResponseLoading = (): boolean => {

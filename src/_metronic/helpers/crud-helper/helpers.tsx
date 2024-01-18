@@ -38,7 +38,7 @@ function parseRequestQuery(query: string): QueryState {
   return cache as QueryState
 }
 
-function calculatedGroupingIsDisabled<T>(isLoading: boolean, data: Array<T> | undefined): boolean {
+function calculatedGroupingIsDisabled<T>(isLoading: boolean, data: any | undefined): boolean {
   if (isLoading) {
     return true
   }
@@ -46,7 +46,7 @@ function calculatedGroupingIsDisabled<T>(isLoading: boolean, data: Array<T> | un
   return !data || !data.length
 }
 
-function calculateIsAllDataSelected<T>(data: Array<T> | undefined, selected: Array<ID>): boolean {
+function calculateIsAllDataSelected<T>(data: any | undefined, selected: Array<ID>): boolean {
   if (!data) {
     return false
   }
@@ -75,7 +75,7 @@ function groupingOnSelect(
 function groupingOnSelectAll<T>(
   isAllSelected: boolean,
   setSelected: Dispatch<SetStateAction<Array<ID>>>,
-  data?: Array<T & {id?: ID}>
+  data?: any
 ) {
   if (isAllSelected) {
     setSelected([])
