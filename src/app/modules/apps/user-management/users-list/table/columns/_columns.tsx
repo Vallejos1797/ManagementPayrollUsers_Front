@@ -2,12 +2,13 @@
 import {Column} from 'react-table'
 import {UserInfoCell} from './UserInfoCell'
 import {UserLastLoginCell} from './UserLastLoginCell'
-import {UserTwoStepsCell} from './UserTwoStepsCell'
 import {UserActionsCell} from './UserActionsCell'
 import {UserSelectionCell} from './UserSelectionCell'
 import {UserCustomHeader} from './UserCustomHeader'
 import {UserSelectionHeader} from './UserSelectionHeader'
 import {User} from '../../core/_models'
+import {dateToStandard} from "../../../../../../../_metronic/helpers/utils/transformadeitors";
+
 
 const usersColumns: ReadonlyArray<Column<User>> = [
   {
@@ -23,7 +24,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
   {
     Header: (props) => <UserCustomHeader tableProps={props} title='Role' className='min-w-125px' />,
     accessor: 'role',
-    Cell: ({...props}) => <span>{props.data[props.row.index]?.role?.description}</span>,
+    Cell: ({...props}) => <span>{props.data[props.row.index]?.role?.description||'Pending Assigned'}</span>,
   },
   {
     Header: (props) => (
@@ -32,18 +33,14 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     id: 'last_login',
     Cell: ({...props}) => <UserLastLoginCell last_login={props.data[props.row.index].last_login} />,
   },
-  {
-    Header: (props) => (
-      <UserCustomHeader tableProps={props} title='Two steps' className='min-w-125px' />
-    ),
-    id: 'two_steps',
-    Cell: ({...props}) => <UserTwoStepsCell two_steps={props.data[props.row.index].two_steps} />,
-  },
+
   {
     Header: (props) => (
       <UserCustomHeader tableProps={props} title='Joined day' className='min-w-125px' />
     ),
     accessor: 'joined_day',
+    Cell: ({...props}) => <span>{dateToStandard(props.data[props.row.index]?.createdAt)}</span>,
+
   },
   {
     Header: (props) => (

@@ -6,11 +6,10 @@ const API_URL = process.env.REACT_APP_THEME_API_URL
 const USER_URL = `${API_URL}/management/users`
 
 
-const getUsers = (): Promise<UsersQueryResponse> => {
+const getUsers = (query: string): Promise<UsersQueryResponse> => {
     return axios
-        .get(`${USER_URL}`)
+        .get(`${USER_URL}?${query}`)
         .then((d: AxiosResponse<UsersQueryResponse>) => {
-            console.log("llega", d)
             return d.data
         })
 }

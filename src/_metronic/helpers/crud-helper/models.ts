@@ -50,7 +50,7 @@ export const initialQueryRequest: QueryRequestContextProps = {
 }
 
 export type QueryResponseContextProps<T> = {
-  data?: Response<Array<T>> | undefined
+  response?: Response<Array<T>> | undefined
   refetch: () => void
   isLoading: boolean
   query: string

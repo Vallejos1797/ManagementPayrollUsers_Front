@@ -52,7 +52,6 @@ export function Registration() {
                     values.changepassword
                 )
                 saveAuth(auth)
-                console.log('llega auth', auth)
                 const {data: user} = await getUserByToken(auth.token, auth.id)
                 setCurrentUser(user)
             } catch (error: any) {

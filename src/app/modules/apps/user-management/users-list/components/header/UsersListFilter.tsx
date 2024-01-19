@@ -8,7 +8,6 @@ const UsersListFilter = () => {
   const {updateState} = useQueryRequest()
   const {isLoading} = useQueryResponse()
   const [role, setRole] = useState<string | undefined>()
-  const [lastLogin, setLastLogin] = useState<string | undefined>()
 
   useEffect(() => {
     MenuComponent.reinitialization()
@@ -20,7 +19,7 @@ const UsersListFilter = () => {
 
   const filterData = () => {
     updateState({
-      filter: {role, last_login: lastLogin},
+      filter: {role},
       ...initialQueryState,
     })
   }
@@ -76,27 +75,6 @@ const UsersListFilter = () => {
           </div>
           {/* end::Input group */}
 
-          {/* begin::Input group */}
-          <div className='mb-10'>
-            <label className='form-label fs-6 fw-bold'>Last login:</label>
-            <select
-              className='form-select form-select-solid fw-bolder'
-              data-kt-select2='true'
-              data-placeholder='Select option'
-              data-allow-clear='true'
-              data-kt-user-table-filter='two-step'
-              data-hide-search='true'
-              onChange={(e) => setLastLogin(e.target.value)}
-              value={lastLogin}
-            >
-              <option value=''></option>
-              <option value='Yesterday'>Yesterday</option>
-              <option value='20 mins ago'>20 mins ago</option>
-              <option value='5 hours ago'>5 hours ago</option>
-              <option value='2 days ago'>2 days ago</option>
-            </select>
-          </div>
-          {/* end::Input group */}
 
           {/* begin::Actions */}
           <div className='d-flex justify-content-end'>
