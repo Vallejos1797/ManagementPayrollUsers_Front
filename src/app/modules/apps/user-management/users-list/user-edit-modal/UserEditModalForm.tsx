@@ -55,7 +55,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
     onSubmit: async (values, {setSubmitting}) => {
       setSubmitting(true)
       try {
-        if (isNotEmpty(values.id)) {
+        if (isNotEmpty(values._id)) {
           await updateUser(values)
         } else {
           await createUser(values)

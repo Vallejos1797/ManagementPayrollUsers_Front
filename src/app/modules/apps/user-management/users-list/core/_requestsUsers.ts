@@ -31,7 +31,7 @@ const createUser = (user: User): Promise<User | undefined> => {
 
 const updateUser = (user: User): Promise<User | undefined> => {
     return axios
-        .post(`${USER_URL}/${user.id}`, user)
+        .post(`${USER_URL}/${user._id}`, user)
         .then((response: AxiosResponse<Response<User>>) => response.data)
         .then((response: Response<User>) => response.data)
 }

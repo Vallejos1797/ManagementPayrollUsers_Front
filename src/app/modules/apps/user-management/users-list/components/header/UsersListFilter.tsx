@@ -14,7 +14,6 @@ const UsersListFilter = () => {
 
     useEffect(() => {
         getRoles("").then((response: Role[]) => {
-            console.log('llega', response);
             setRoles(response); // Almacena el rol en un array para el estado
         });
     }, []);

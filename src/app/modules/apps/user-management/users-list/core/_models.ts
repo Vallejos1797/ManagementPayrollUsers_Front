@@ -1,6 +1,6 @@
 import {ID, Response} from '../../../../../../_metronic/helpers'
 export type User = {
-  id?: ID
+  _id?: ID
   username?: string
   avatar?: string
   email?: string
