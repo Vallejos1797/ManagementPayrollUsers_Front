@@ -1,9 +1,10 @@
 import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../../_metronic/helpers'
-import {User, UsersQueryResponse} from './_models'
+import {Role, User, UsersQueryResponse} from './_models'
 
 const API_URL = process.env.REACT_APP_THEME_API_URL
 const USER_URL = `${API_URL}/management/users`
+const ROLES_URL = `${API_URL}/management/roles`
 
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {
@@ -46,4 +47,12 @@ const deleteSelectedUsers = (userIds: Array<ID>): Promise<void> => {
     })
 }
 
-export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser}
+const getRoles = (query: string): Promise<Role[]> => {
+    return axios
+        .get(`${ROLES_URL}?${query}`)
+        .then((d: AxiosResponse<Role[]>) => {
+            return d.data
+        })
+}
+
+export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser,getRoles}

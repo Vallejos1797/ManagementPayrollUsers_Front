@@ -6,7 +6,7 @@ import {initialUser, User} from '../core/_models'
 import clsx from 'clsx'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser, updateUser} from '../core/_requests'
+import {createUser, updateUser} from '../core/_requestsUsers'
 import {useQueryResponse} from '../core/QueryResponseProvider'
 
 type Props = {

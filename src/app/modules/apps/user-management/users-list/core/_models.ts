@@ -16,7 +16,18 @@ export type User = {
   }
 }
 
+export type Role = {
+  _id: string;
+  description?: string;
+  permissions?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+
+
 export type UsersQueryResponse = Response<Array<User>>
+export type RolesQueryResponse = Response<Array<Role>>
 
 export const initialUser: User = {
   avatar: 'avatars/300-6.jpg',
