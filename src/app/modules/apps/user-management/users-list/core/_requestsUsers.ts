@@ -5,6 +5,7 @@ import {Role, User, UsersQueryResponse} from './_models'
 const API_URL = process.env.REACT_APP_THEME_API_URL
 const USER_URL = `${API_URL}/management/users`
 const ROLES_URL = `${API_URL}/management/roles`
+const PERSON_URL = `${API_URL}/management/persons`
 
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {
@@ -22,12 +23,12 @@ const getUserById = (id: ID): Promise<User | undefined> => {
         .then((response: Response<User>) => response.data)
 }
 
-const createUser = (user: User): Promise<User | undefined> => {
+const createUser = (user: any): Promise<any | undefined> => {
     return axios
-        .put(USER_URL, user)
-        .then((response: AxiosResponse<Response<User>>) => response.data)
-        .then((response: Response<User>) => response.data)
+        .post(USER_URL, user)
+        .then((response: AxiosResponse<Response<any>>) => response.data)
 }
+
 
 const updateUser = (user: User): Promise<User | undefined> => {
     return axios
@@ -55,4 +56,17 @@ const getRoles = (query: string): Promise<Role[]> => {
         })
 }
 
-export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser,getRoles}
+
+const createPerson = (person: any): Promise<any | undefined> => {
+    console.log('va crear person', person)
+
+    return axios
+        .post(PERSON_URL, person)
+        .then((response: AxiosResponse<Response<any>>) => {
+            console.log("trajo", response)
+            return response.data
+        })
+
+}
+
+export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser, getRoles, createPerson}
