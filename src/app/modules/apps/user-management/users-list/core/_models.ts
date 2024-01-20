@@ -30,11 +30,21 @@ export type User = {
 }
 
 export type Role = {
-    _id: string;
+    _id?: string;
     description?: string;
     permissions?: string[];
     createdAt?: string;
     updatedAt?: string;
+}
+
+export type Person = {
+    _id?: string;
+    firstName?: string
+    lastName?: string
+    identity?: string
+    phone?: string
+    direction?: string
+    birthday?: string
 }
 
 

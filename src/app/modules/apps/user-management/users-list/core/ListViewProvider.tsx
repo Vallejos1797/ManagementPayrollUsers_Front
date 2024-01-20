@@ -33,7 +33,6 @@ const ListViewProvider: FC<WithChildren> = ({children}) => {
                     groupingOnSelect(id, selected, setSelected)
                 },
                 onSelectAll: () => {
-                    console.log("son seleccionados todos", isAllSelected)
                     return groupingOnSelectAll(isAllSelected, setSelected, data)
                 },
                 clearSelected: () => {

@@ -2,12 +2,13 @@ import {FC, useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {initialUser, Role, User} from '../core/_models'
+import {initialUser, Person, Role, User} from '../core/_models'
 import clsx from 'clsx'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser, getRoles, createPerson, updateUser} from '../core/_requestsUsers'
+import {createUser, getRoles, createPerson, updateUser, updatePerson} from '../core/_requestsUsers'
 import {useQueryResponse} from '../core/QueryResponseProvider'
+import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
 
 type Props = {
@@ -61,7 +62,6 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             setRoles(response); // Almacena el rol en un array para el estado
         });
     }, []);
-    console.log("llega el user", user)
     const [userForEdit] = useState<User>({
         ...user,
         username: user.username || "",
@@ -70,12 +70,12 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         role: user.role ? user.role._id : "",
 
         // Person information
-        firstName: user.firstName || "",
-        lastName: user.lastName || "newuser",
-        identity: user.identity || "",
-        phone: user.phone || "",
-        direction: "",
-        birthday: user.birthday || new Date().toDateString(),
+        firstName: user.person?user.person.firstName: "",
+        lastName: user.person?user.person.lastName: "",
+        identity: user.person?user.person.identity: "",
+        phone: user.person?user.person.phone: "",
+        direction: user.person?user.person.direction:"",
+        birthday: user.person?user.person.birthday: new Date().toDateString(),
 
 
         // complement attributes
@@ -83,7 +83,6 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         position: user.position || initialUser.position,
     })
 
-    console.log("llega", userForEdit)
 
     const cancel = (withRefresh?: boolean) => {
         if (withRefresh) {
@@ -102,7 +101,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         initialValues: userForEdit,
         validationSchema: editUserSchema,
         onSubmit: async (values, {setSubmitting}) => {
-            const person = {
+            const person: Person = {
                 firstName: values.firstName,
                 lastName: values.lastName,
                 identity: values.identity,
@@ -119,13 +118,17 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             setSubmitting(true)
             try {
                 if (isNotEmpty(values._id)) {
-                    await updateUser(values)
+                    person._id = userForEdit.person._id
+                    await updatePerson(person).then(()=> {
+                    })
+
+                    await updateUser(values).then(() => {
+                    })
                 } else {
                     await createPerson(person).then(data => {
                         user.personId = data._id
                     })
-                    await createUser(user).then(newUser => {
-                        console.log("se creó el usuario", newUser);
+                    await createUser(user).then(() => {
                     })
 
                 }
@@ -461,7 +464,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                             placeholder='Direction'
                             {...formik.getFieldProps('direction')}
                             type='text'
-                            name='phone'
+                            name='direction'
                             className={clsx(
                                 'form-control form-control-solid mb-3 mb-lg-0',
                                 {'is-invalid': formik.touched.direction && formik.errors.direction},

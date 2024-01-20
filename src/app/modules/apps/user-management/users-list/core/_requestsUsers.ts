@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../../_metronic/helpers'
-import {Role, User, UsersQueryResponse} from './_models'
+import {Person, Role, User, UsersQueryResponse} from './_models'
 
 const API_URL = process.env.REACT_APP_THEME_API_URL
 const USER_URL = `${API_URL}/management/users`
@@ -16,11 +16,15 @@ const getUsers = (query: string): Promise<UsersQueryResponse> => {
         })
 }
 
-const getUserById = (id: ID): Promise<User | undefined> => {
+const getUserById = (id: ID): Promise<any | undefined> => {
     return axios
         .get(`${USER_URL}/${id}`)
-        .then((response: AxiosResponse<Response<User>>) => response.data)
-        .then((response: Response<User>) => response.data)
+        .then((response: AxiosResponse<Response<User>>) => {
+            return response.data
+        })
+        .then((response: Response<User>) => {
+            return response
+        })
 }
 
 const createUser = (user: any): Promise<any | undefined> => {
@@ -32,7 +36,7 @@ const createUser = (user: any): Promise<any | undefined> => {
 
 const updateUser = (user: User): Promise<User | undefined> => {
     return axios
-        .post(`${USER_URL}/${user._id}`, user)
+        .put(`${USER_URL}/${user._id}`, user)
         .then((response: AxiosResponse<Response<User>>) => response.data)
         .then((response: Response<User>) => response.data)
 }
@@ -69,4 +73,11 @@ const createPerson = (person: any): Promise<any | undefined> => {
 
 }
 
-export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser, getRoles, createPerson}
+const updatePerson = (person: Person): Promise<any | undefined> => {
+    return axios
+        .put(`${PERSON_URL}/${person._id}`, person)
+        .then((response: AxiosResponse<Response<User>>) => response.data)
+        .then((response: Response<User>) => response)
+}
+
+export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser, getRoles, createPerson,updatePerson}
