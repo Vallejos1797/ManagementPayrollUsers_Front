@@ -8,6 +8,7 @@ import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
 import {createUser, getRoles, createPerson, updateUser} from '../core/_requestsUsers'
 import {useQueryResponse} from '../core/QueryResponseProvider'
+import Flatpickr from "react-flatpickr";
 
 type Props = {
     isUserLoading: boolean
@@ -60,21 +61,21 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             setRoles(response); // Almacena el rol en un array para el estado
         });
     }, []);
-
+    console.log("llega el user", user)
     const [userForEdit] = useState<User>({
         ...user,
-        username: user.username || "newuser",
-        email: user.email || "newuser@gmail.com",
+        username: user.username || "",
+        email: user.email || "",
         password: '',
         role: user.role ? user.role._id : "",
 
         // Person information
-        firstName: user.firstName || "newuser",
+        firstName: user.firstName || "",
         lastName: user.lastName || "newuser",
         identity: user.identity || "",
-        phone: user.phone || "0336547899",
-        direction: user.direction || "",
-        birthday: user.birthday || "1997-03-16T00:00:00.000Z",
+        phone: user.phone || "",
+        direction: "",
+        birthday: user.birthday || new Date().toDateString(),
 
 
         // complement attributes
@@ -90,6 +91,9 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         }
         setItemIdForUpdate(undefined)
     }
+    const transformDate = (date: string) => {
+        return new Date(date).toISOString()
+    }
 
     const blankImg = toAbsoluteUrl('/media/svg/avatars/blank.svg')
     const userAvatarImg = toAbsoluteUrl(`/media/${userForEdit.avatar}`)
@@ -103,8 +107,8 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                 lastName: values.lastName,
                 identity: values.identity,
                 phone: values.phone,
-                direction: "values.direction",
-                birthday: values.birthday,
+                direction: values.direction,
+                birthday: transformDate(values.birthday || ""),
             }
             const user: any = {
                 username: values.username,
@@ -455,9 +459,9 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         {/* begin::Input */}
                         <input
                             placeholder='Direction'
-                            {...formik.getFieldProps('')}
+                            {...formik.getFieldProps('direction')}
                             type='text'
-                            name='direction'
+                            name='phone'
                             className={clsx(
                                 'form-control form-control-solid mb-3 mb-lg-0',
                                 {'is-invalid': formik.touched.direction && formik.errors.direction},
@@ -485,11 +489,10 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         <label className=' fw-bold fs-6 mb-2'>Birthday</label>
                         {/* end::Label */}
 
-                        {/* begin::Input */}
-                        <input
+                        {/* begin::Flatpickr */}
+                        <Flatpickr
                             placeholder='Birthday'
                             {...formik.getFieldProps('birthday')}
-                            type='text'
                             name='birthday'
                             className={clsx(
                                 'form-control form-control-solid mb-3 mb-lg-0',
@@ -499,8 +502,19 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                                 }
                             )}
                             autoComplete='off'
+                            options={{
+                                dateFormat: 'Y-m-d', // Ajusta el formato de fecha según tus necesidades
+                                enable: [
+                                    {
+                                        from: '1900-01-01', // Puedes ajustar el rango según tus necesidades
+                                        to: '2050-12-31', // Puedes ajustar el rango según tus necesidades
+                                    },
+                                ],
+                            }}
                             disabled={formik.isSubmitting || isUserLoading}
                         />
+                        {/* end::Flatpickr */}
+
                         {formik.touched.birthday && formik.errors.birthday && (
                             <div className='fv-plugins-message-container'>
                                 <div className='fv-help-block'>
@@ -508,7 +522,6 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                                 </div>
                             </div>
                         )}
-                        {/* end::Input */}
                     </div>
                     {/* end::Input group */}
 
@@ -522,34 +535,35 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         {roles.length > 0 && (
 
                             roles.map((role) => (
-                                    <div className='d-flex fv-row mt-5' key={'div-' + role._id}>
-                                        {/* begin::Radio */}
-                                        <div className='form-check form-check-custom form-check-solid'>
-                                            {/* begin::Input */}
-                                            <input
-                                                key={role._id}
-                                                className='form-check-input me-3'
-                                                {...formik.getFieldProps('role')}
-                                                name='role'
-                                                type='radio'
-                                                id={'kt_modal_update_role_option_' + role._id}
-                                                value={role._id}  // Asignar el valor del rol al input
-                                                checked={formik.values.role === role._id}
-                                                disabled={formik.isSubmitting || isUserLoading}
-                                            />
-                                            {/* end::Input */}
-                                            {/* begin::Label */}
-                                            <label className='form-check-label' htmlFor={'kt_modal_update_role_option_' + role._id}>
-                                                <div className='fw-bolder text-gray-800'>{role.description}</div>
-                                                <div className='text-gray-600'>
-                                                    View Permission
-                                                </div>
-                                            </label>
-                                            {/* end::Label */}
-                                        </div>
-                                        {/* end::Radio */}
+                                <div className='d-flex fv-row mt-5' key={'div-' + role._id}>
+                                    {/* begin::Radio */}
+                                    <div className='form-check form-check-custom form-check-solid'>
+                                        {/* begin::Input */}
+                                        <input
+                                            key={role._id}
+                                            className='form-check-input me-3'
+                                            {...formik.getFieldProps('role')}
+                                            name='role'
+                                            type='radio'
+                                            id={'kt_modal_update_role_option_' + role._id}
+                                            value={role._id}  // Asignar el valor del rol al input
+                                            checked={formik.values.role === role._id}
+                                            disabled={formik.isSubmitting || isUserLoading}
+                                        />
+                                        {/* end::Input */}
+                                        {/* begin::Label */}
+                                        <label className='form-check-label'
+                                               htmlFor={'kt_modal_update_role_option_' + role._id}>
+                                            <div className='fw-bolder text-gray-800'>{role.description}</div>
+                                            <div className='text-gray-600'>
+                                                View Permission
+                                            </div>
+                                        </label>
+                                        {/* end::Label */}
                                     </div>
-                                ))
+                                    {/* end::Radio */}
+                                </div>
+                            ))
 
                         )}
                         {/* end::Input row */}
