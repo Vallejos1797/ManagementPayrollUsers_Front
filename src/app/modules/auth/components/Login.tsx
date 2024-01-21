@@ -44,7 +44,7 @@ export function Login() {
         const {data: auth} = await login(values.email, values.password)
         auth.api_token=auth.token
         saveAuth(auth)
-        const {data: user} = await getUserByToken( auth.api_token, auth.id)
+        const {data: user} = await getUserByToken( auth.api_token, auth._id)
         setCurrentUser(user)
       } catch (error) {
         console.error(error)

@@ -90,7 +90,7 @@ const AuthInit: FC<WithChildren> = ({children}) => {
         }
 
         if (auth && auth.api_token) {
-            requestUser(auth.api_token, auth.id)
+            requestUser(auth.api_token, auth._id)
         } else {
             logout()
             setShowSplashScreen(false)

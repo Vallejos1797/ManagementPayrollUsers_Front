@@ -1,7 +1,7 @@
 export interface AuthModel {
   token: string
   api_token: string
-  id?:string
+  _id?:string
   refreshToken?: string
 }
 
