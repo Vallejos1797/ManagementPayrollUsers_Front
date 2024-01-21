@@ -5,7 +5,7 @@ import {MenuComponent} from '../../../../../../../_metronic/assets/ts/components
 import {ID, KTIcon, QUERIES} from '../../../../../../../_metronic/helpers'
 import {useListView} from '../../core/ListViewProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
-import {deleteUser} from '../../core/_requests'
+import {deleteUser} from '../../core/_requestsUsers'
 
 type Props = {
   id: ID
@@ -21,6 +21,7 @@ const UserActionsCell: FC<Props> = ({id}) => {
   }, [])
 
   const openEditModal = () => {
+    console.log("-->",id)
     setItemIdForUpdate(id)
   }
 

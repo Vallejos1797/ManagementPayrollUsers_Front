@@ -2,7 +2,7 @@ import {useQueryClient, useMutation} from 'react-query'
 import {QUERIES} from '../../../../../../../_metronic/helpers'
 import {useListView} from '../../core/ListViewProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
-import {deleteSelectedUsers} from '../../core/_requests'
+import {deleteSelectedUsers} from '../../core/_requestsUsers'
 
 const UsersListGrouping = () => {
   const {selected, clearSelected} = useListView()
