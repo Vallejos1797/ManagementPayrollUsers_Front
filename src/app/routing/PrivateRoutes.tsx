@@ -9,60 +9,70 @@ import {WithChildren} from '../../_metronic/helpers'
 import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
 
 const PrivateRoutes = () => {
-  const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
-  const UsersPage = lazy(() => import('../modules/apps/user-management/UsersPage'))
+    const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
+    const ManagementUsersPage = lazy(() => import('../modules/apps/user-management/UsersPage'))
+    const MonitorUsersPage = lazy(() => import('../modules/apps/user-monitor/UsersPage'))
 
-  return (
-    <Routes>
-      <Route element={<MasterLayout />}>
-        {/* Redirect to Dashboard after success login/registartion */}
-        <Route path='auth/*' element={<Navigate to='/dashboard' />} />
-        {/* Pages */}
-        <Route path='dashboard' element={<DashboardWrapper />} />
-        <Route
-          path='builder'
-          element={
-            <SuspensedView>
-              <BuilderPageWrapper />
-            </SuspensedView>
-          }
-        />
-        <Route path='menu-test' element={<MenuTestPage />} />
-        {/* Lazy Modules */}
-        <Route
-          path='crafted/pages/profile/*'
-          element={
-            <SuspensedView>
-              <ProfilePage />
-            </SuspensedView>
-          }
-        />
+    return (
+        <Routes>
+            <Route element={<MasterLayout/>}>
+                {/* Redirect to Dashboard after success login/registartion */}
+                <Route path='auth/*' element={<Navigate to='/dashboard'/>}/>
+                {/* Pages */}
+                <Route path='dashboard' element={<DashboardWrapper/>}/>
+                <Route
+                    path='builder'
+                    element={
+                        <SuspensedView>
+                            <BuilderPageWrapper/>
+                        </SuspensedView>
+                    }
+                />
+                <Route path='menu-test' element={<MenuTestPage/>}/>
+                {/* Lazy Modules */}
+                <Route
+                    path='crafted/pages/profile/*'
+                    element={
+                        <SuspensedView>
+                            <ProfilePage/>
+                        </SuspensedView>
+                    }
+                />
 
-        <Route
-          path='apps/user-management/*'
-          element={
-            <SuspensedView>
-              <UsersPage />
-            </SuspensedView>
-          }
-        />
-        {/* Page Not Found */}
-        <Route path='*' element={<Navigate to='/error/404' />} />
-      </Route>
-    </Routes>
-  )
+                <Route
+                    path='apps/user-management/*'
+                    element={
+                        <SuspensedView>
+                            <ManagementUsersPage/>
+                        </SuspensedView>
+                    }
+                />
+
+                <Route
+                    path='apps/user-monitor/*'
+                    element={
+                        <SuspensedView>
+                            <MonitorUsersPage/>
+                        </SuspensedView>
+                    }
+                />
+                {/* Page Not Found */}
+                <Route path='*' element={<Navigate to='/error/404'/>}/>
+            </Route>
+        </Routes>
+    )
 }
 
 const SuspensedView: FC<WithChildren> = ({children}) => {
-  const baseColor = getCSSVariableValue('--bs-primary')
-  TopBarProgress.config({
-    barColors: {
-      '0': baseColor,
-    },
-    barThickness: 1,
-    shadowBlur: 5,
-  })
-  return <Suspense fallback={<TopBarProgress />}>{children}</Suspense>
+    const baseColor = getCSSVariableValue('--bs-primary')
+    TopBarProgress.config({
+        barColors: {
+            '0': baseColor,
+        },
+        barThickness: 1,
+        shadowBlur: 5,
+    })
+    return <Suspense fallback={<TopBarProgress/>}>{children}</Suspense>
 }
 
 export {PrivateRoutes}
