@@ -5,8 +5,13 @@ import {useQueryRequest} from '../../core/QueryRequestProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
 import {getRoles} from "../../core/_requestsUsers";
 import {Role} from "../../core/_models";
+import Flatpickr from "react-flatpickr";
 
 const UsersListFilter = () => {
+    const [dateState, setDateState] = useState<any>({
+        startDate: new Date(),
+        endDate: new Date()
+    });
     const {updateState} = useQueryRequest()
     const {isLoading} = useQueryResponse()
     const [role, setRole] = useState<string | undefined>()
@@ -83,6 +88,63 @@ const UsersListFilter = () => {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+                        )}
+                    </div>
+                    {/* end::Input group */}
+
+
+                    {/* begin::Input group */}
+                    <div>
+                        {roles.length > 0 && (
+                            <div className='mb-10'>
+                                <label className='form-label fs-6 fw-bold'>Type Check:</label>
+                                <select
+                                    className='form-select form-select-solid fw-bolder'
+                                    data-kt-select2='true'
+                                    data-placeholder='Select option'
+                                    data-allow-clear='true'
+                                    data-kt-user-table-filter='typeCheck'
+                                    data-hide-search='true'
+                                    onChange={(e) => setRole(e.target.value)}
+                                    value={role}
+                                    multiple={true}
+                                >
+                                    <option value=''></option>
+                                    {roles.map((role) => (
+                                        <option key={role._id} value={role._id}>
+                                            {role.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                    </div>
+                    {/* end::Input group */}
+
+                    {/* begin::Input group */}
+                    <div>
+                        {roles.length > 0 && (
+                            <div className='mb-10'>
+                                <div>
+                                    {roles.length > 0 && (
+                                        <div className='mb-10'>
+                                            <label className='form-label fs-6 fw-bold'>Range Date:</label>
+
+                                            <Flatpickr
+                                                value={dateState.date}
+                                                onChange={([startDate, endDate]) => {
+                                                    setDateState({startDate, endDate});
+                                                }}
+                                                options={{
+                                                    mode: "range",
+                                                }}
+                                                className='form-control form-control-solid'
+                                                placeholder='Pick date'
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
