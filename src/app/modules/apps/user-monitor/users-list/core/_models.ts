@@ -7,6 +7,9 @@ export type User = {
     password?: string
     person?: any
     role?: any
+    company?: any;
+    office?: any;
+    department?: any;
     // Person information
 
     firstName?: string

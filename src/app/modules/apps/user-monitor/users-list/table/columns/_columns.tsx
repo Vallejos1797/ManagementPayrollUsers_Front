@@ -1,6 +1,7 @@
 // @ts-nocheck
 import {Column} from 'react-table'
 import {UserInfoCell} from './UserInfoCell'
+import {OfficeInfoCell} from './OfficeInfoCell'
 import {UserSelectionCell} from './UserSelectionCell'
 import {UserActionsCell} from './UserActionsCell'
 import {UserCustomHeader} from './UserCustomHeader'
@@ -30,7 +31,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
             <UserCustomHeader tableProps={props} title='Office' className='min-w-125px'/>
         ),
         id: 'Office',
-        Cell: ({...props}) => <span>{props.data[props.row.index]?.role?.office || 'Pending Assigned'}</span>,
+        Cell: ({...props}) => <OfficeInfoCell user={props.data[props.row.index]}/>,
     },
 
     {
@@ -38,7 +39,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
             <UserCustomHeader tableProps={props} title='Last Check' className='min-w-125px'/>
         ),
         accessor: 'joined_day',
-        Cell: ({...props}) => <UserLastCheckCell check={props.data[props.row.index].activities[0] || null}/>,
+        Cell: ({...props}) => <UserLastCheckCell check={props.data[props.row.index].lastActivity || null}/>,
 
     },
     {
