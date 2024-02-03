@@ -94,7 +94,7 @@ const UsersListFilter = () => {
                         <button
                             type='button'
                             disabled={isLoading}
-                            onClick={filterData}
+                            onClick={resetData}
                             className='btn btn-light btn-active-light-primary fw-bold me-2 px-6'
                             data-kt-menu-dismiss='true'
                             data-kt-user-table-filter='reset'
@@ -104,7 +104,7 @@ const UsersListFilter = () => {
                         <button
                             disabled={isLoading}
                             type='button'
-                            onClick={resetData}
+                            onClick={filterData}
                             className='btn btn-primary fw-bold px-6'
                             data-kt-menu-dismiss='true'
                             data-kt-user-table-filter='filter'

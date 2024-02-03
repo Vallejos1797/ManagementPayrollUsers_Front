@@ -39,6 +39,13 @@ export type Role = {
     createdAt?: string;
     updatedAt?: string;
 }
+export type TypeActivity = {
+    _id?: string;
+    description?: string;
+    key?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
 
 export type Person = {
     _id?: string;
