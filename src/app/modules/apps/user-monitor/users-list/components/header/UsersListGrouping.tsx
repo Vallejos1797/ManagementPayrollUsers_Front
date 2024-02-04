@@ -1,21 +1,23 @@
 import {useListView} from '../../core/ListViewProvider'
-import {initialQueryState, KTIcon} from "../../../../../../../_metronic/helpers";
+import {KTIcon} from "../../../../../../../_metronic/helpers";
 import {generateReportUsers} from "../../core/_requestsUsers";
+import {useQueryRequest} from "../../core/QueryRequestProvider";
 
 
 const UsersListGrouping = () => {
     const {selected} = useListView()
+    const {state} = useQueryRequest();
 
     const filterData = async () => {
         try {
             // TO DO: Capturar los filtros y pasarlos como argumento a generateReportUsers si es necesario
-            console.log('Va a consumir con:', selected, initialQueryState);
+            console.log('Va a consumir con:', selected, state);
 
-            const response = await generateReportUsers({selected}); // Llamada a generateReportUsers para obtener la respuesta
+            const response = await generateReportUsers({users: selected, ...state}); // Llamada a generateReportUsers para obtener la respuesta
 
             // Verificar si la respuesta es válida y contiene un Blob
             if (response && response instanceof Blob) {
-                 // Asignar el Blob obtenido de la respuesta
+                // Asignar el Blob obtenido de la respuesta
                 // Crear un objeto URL del blob
                 const url = window.URL.createObjectURL(response);
 
@@ -32,7 +34,6 @@ const UsersListGrouping = () => {
             // Manejar el error en caso de fallo en la descarga
         }
     };
-
 
 
     return (

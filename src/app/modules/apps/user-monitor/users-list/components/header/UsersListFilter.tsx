@@ -37,7 +37,7 @@ const UsersListFilter = () => {
     }
 
     const filterData = () => {
-        console.log('dateState', dateState);
+
         const { endDate, startDate } = dateState;
 
         // Crear objetos Date a partir de las fechas en formato "1997-03-16T00:00:00.000Z"
@@ -48,7 +48,6 @@ const UsersListFilter = () => {
         const isoFormattedEndDate = formattedEndDate.toISOString();
         const isoFormattedStartDate = formattedStartDate.toISOString();
 
-        // Ahora, puedes usar estas cadenas de fecha en tu estado o donde sea necesario
         updateState({
             filter: { role, typeCheck, endDate: isoFormattedEndDate, startDate: isoFormattedStartDate },
             ...initialQueryState,

@@ -35,6 +35,7 @@ interface ServerResponse {
 }
 
 const generateReportUsers = (filters: any): Promise<ServerResponse | void> => {
+    console.log('manda al back ', filters)
     return axios
         .post<ServerResponse>(REPORT_XLSX, filters, {
             responseType: 'blob', // Indica que esperamos un archivo como respuesta
