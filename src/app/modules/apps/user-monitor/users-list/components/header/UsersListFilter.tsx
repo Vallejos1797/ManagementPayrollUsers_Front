@@ -3,18 +3,29 @@ import {MenuComponent} from '../../../../../../../_metronic/assets/ts/components
 import {initialQueryState, KTIcon} from '../../../../../../../_metronic/helpers'
 import {useQueryRequest} from '../../core/QueryRequestProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
-import {getRoles} from "../../core/_requestsUsers";
-import {Role} from "../../core/_models";
+import {getRoles, getTypeChecks} from "../../core/_requestsUsers";
+import {Role, TypeActivity} from "../../core/_models";
+import "flatpickr/dist/themes/material_green.css";
+import Flatpickr from "react-flatpickr";
 
 const UsersListFilter = () => {
+    const [dateState, setDateState] = useState<any>({
+        startDate: new Date(),
+        endDate: new Date()
+    });
     const {updateState} = useQueryRequest()
     const {isLoading} = useQueryResponse()
     const [role, setRole] = useState<string | undefined>()
     const [roles, setRoles] = useState<Role[]>([]);
+    const [typeCheck, setTypeCheck] = useState<string | undefined>()
+    const [typeChecks, setTypeChecks] = useState<Role[]>([]);
 
     useEffect(() => {
         getRoles("").then((response: Role[]) => {
             setRoles(response); // Almacena el rol en un array para el estado
+        });
+        getTypeChecks("").then((response: TypeActivity[]) => {
+            setTypeChecks(response);
         });
     }, []);
 
@@ -27,10 +38,21 @@ const UsersListFilter = () => {
     }
 
     const filterData = () => {
+
+        const { endDate, startDate } = dateState;
+
+        // Crear objetos Date a partir de las fechas en formato "1997-03-16T00:00:00.000Z"
+        const formattedEndDate = new Date(endDate);
+        const formattedStartDate = new Date(startDate);
+
+        // Obtener cadenas de fecha en formato ISO 8601 con zona horaria UTC
+        const isoFormattedEndDate = formattedEndDate.toISOString();
+        const isoFormattedStartDate = formattedStartDate.toISOString();
+
         updateState({
-            filter: {role},
+            filter: { role, typeCheck, endDate: isoFormattedEndDate, startDate: isoFormattedStartDate },
             ...initialQueryState,
-        })
+        });
     }
 
     return (
@@ -83,6 +105,63 @@ const UsersListFilter = () => {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+                        )}
+                    </div>
+                    {/* end::Input group */}
+
+
+                    {/* begin::Input group */}
+                    <div>
+                        {typeChecks.length > 0 && (
+                            <div className='mb-10'>
+                                <label className='form-label fs-6 fw-bold'>Type Check:</label>
+                                <select
+                                    className='form-select form-select-solid fw-bolder'
+                                    data-kt-select2='true'
+                                    data-placeholder='Select option'
+                                    data-allow-clear='true'
+                                    data-kt-user-table-filter='typeCheck'
+                                    data-hide-search='true'
+                                    onChange={(e) => setTypeCheck(e.target.value)}
+                                    value={typeCheck}
+                                    multiple={false}
+                                >
+                                    <option value=''></option>
+                                    {typeChecks.map((typeCheck) => (
+                                        <option key={typeCheck._id} value={typeCheck._id}>
+                                            {typeCheck.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                    </div>
+                    {/* end::Input group */}
+
+                    {/* begin::Input group */}
+                    <div>
+                        {roles.length > 0 && (
+                            <div className='mb-10'>
+                                <div>
+                                    {roles.length > 0 && (
+                                        <div className='mb-10'>
+                                            <label className='form-label fs-6 fw-bold'>Range Date:</label>
+
+                                            <Flatpickr
+                                                value={dateState.date}
+                                                onChange={([startDate, endDate]) => {
+                                                    setDateState({startDate, endDate});
+                                                }}
+                                                options={{
+                                                    mode: "range",
+                                                }}
+                                                className='form-control form-control-solid'
+                                                placeholder='Pick date'
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>

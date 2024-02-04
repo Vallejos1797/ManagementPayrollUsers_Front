@@ -62,7 +62,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             setRoles(response); // Almacena el rol en un array para el estado
         });
     }, []);
-    const [userForEdit] = useState<User>({
+    const [userForEdit, setFormEdit] = useState<User>({
         ...user,
         username: user.username || "",
         email: user.email || "",
@@ -70,12 +70,12 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         role: user.role ? user.role._id : "",
 
         // Person information
-        firstName: user.person?user.person.firstName: "",
-        lastName: user.person?user.person.lastName: "",
-        identity: user.person?user.person.identity: "",
-        phone: user.person?user.person.phone: "",
-        direction: user.person?user.person.direction:"",
-        birthday: user.person?user.person.birthday: new Date().toDateString(),
+        firstName: user.person ? user.person.firstName : "",
+        lastName: user.person ? user.person.lastName : "",
+        identity: user.person ? user.person.identity : "",
+        phone: user.person ? user.person.phone : "",
+        direction: user.person ? user.person.direction : "",
+        birthday: user.person ? user.person.birthday : new Date().toDateString(),
 
 
         // complement attributes
@@ -119,7 +119,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             try {
                 if (isNotEmpty(values._id)) {
                     person._id = userForEdit.person._id
-                    await updatePerson(person).then(()=> {
+                    await updatePerson(person).then(() => {
                     })
 
                     await updateUser(values).then(() => {
@@ -495,15 +495,18 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         {/* begin::Flatpickr */}
                         <Flatpickr
                             placeholder='Birthday'
-                            {...formik.getFieldProps('birthday')}
+                            value={userForEdit.birthday}
+                            onChange={([date]) => {
+                                setFormEdit(prevUser => ({
+                                    ...prevUser,
+                                    person: {
+                                        ...prevUser.person,
+                                        birthday: date.toDateString(),
+                                    },
+                                }))
+                            }}
                             name='birthday'
-                            className={clsx(
-                                'form-control form-control-solid mb-3 mb-lg-0',
-                                {'is-invalid': formik.touched.birthday && formik.errors.birthday},
-                                {
-                                    'is-valid': formik.touched.birthday && !formik.errors.birthday,
-                                }
-                            )}
+                            className='form-control form-control-solid mb-3 mb-lg-0'
                             autoComplete='off'
                             options={{
                                 dateFormat: 'Y-m-d', // Ajusta el formato de fecha según tus necesidades

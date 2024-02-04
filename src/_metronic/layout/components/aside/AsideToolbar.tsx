@@ -1,6 +1,6 @@
 import {useAuth} from '../../../../app/modules/auth'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
-import {HeaderUserMenu, Search} from '../../../partials'
+import {HeaderUserMenu} from '../../../partials'
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 const AsideToolbar = () => {
@@ -24,12 +24,12 @@ const AsideToolbar = () => {
             <div className='flex-grow-1 me-2'>
               {/*begin::Username*/}
               <a href='#' className='text-white text-hover-primary fs-6 fw-bold'>
-                {currentUser?.first_name} {currentUser?.last_name}
+                {currentUser?.person?.firstName} {currentUser?.person?.lastName}
               </a>
               {/*end::Username*/}
 
               {/*begin::Description*/}
-              <span className='text-gray-600 fw-bold d-block fs-8 mb-1'>Python dev</span>
+              <span className='text-gray-600 fw-bold d-block fs-8 mb-1'>{currentUser?.role?.description}</span>
               {/*end::Description*/}
 
               {/*begin::Label*/}
@@ -65,14 +65,14 @@ const AsideToolbar = () => {
       {/*end::User*/}
 
       {/*begin::Aside search*/}
-      <div className='aside-search py-5'>
+      {/*<div className='aside-search py-5'>*/}
         {/* <?php Theme::getView('partials/search/_inline', array(
         'class' => 'w-100',
         'menu-placement' => 'bottom-start',
         'responsive' => 'false'
     ))?> */}
-        <Search />
-      </div>
+        {/*<Search />*/}
+      {/*</div>*/}
       {/*end::Aside search*/}
     </>
   )

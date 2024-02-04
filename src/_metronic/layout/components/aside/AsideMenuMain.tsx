@@ -12,17 +12,18 @@ export function AsideMenuMain() {
         icon='element-11'
         title={intl.formatMessage({id: 'MENU.DASHBOARD'})}
       />
+        <div className='menu-item'>
+            <div className='menu-content pt-8 pb-2'>
+                <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Monitor</span>
+                <AsideMenuItem to='/apps/user-monitor/users' icon='shield-tick' title='Users Monitor' />
+            </div>
+        </div>
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Administrator</span>
         </div>
       </div>
-
-
-
-
-
-      <AsideMenuItem to='/apps/user-management/users' icon='shield-tick' title='User management' />
+      <AsideMenuItem to='/apps/user-management/users' icon='shield-tick' title='Users management' />
 
     </>
   )
