@@ -4,6 +4,10 @@ export interface AuthModel {
     _id?: string
     refreshToken?: string
     role?: any
+    person?: any
+    office?: any
+    department?: any
+    company?: any
 }
 
 export interface UserAddressModel {
@@ -58,6 +62,7 @@ export interface UserModel {
     companyName?: string
     phone?: string
     role?: any
+    person?: any
     pic?: string
     language?: 'en' | 'de' | 'es' | 'fr' | 'ja' | 'zh' | 'ru'
     timeZone?: string

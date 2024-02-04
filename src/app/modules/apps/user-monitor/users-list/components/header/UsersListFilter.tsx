@@ -5,6 +5,7 @@ import {useQueryRequest} from '../../core/QueryRequestProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
 import {getRoles, getTypeChecks} from "../../core/_requestsUsers";
 import {Role, TypeActivity} from "../../core/_models";
+import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
 
 const UsersListFilter = () => {
