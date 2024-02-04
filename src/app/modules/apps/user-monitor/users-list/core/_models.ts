@@ -7,6 +7,9 @@ export type User = {
     password?: string
     person?: any
     role?: any
+    company?: any;
+    office?: any;
+    department?: any;
     // Person information
 
     firstName?: string
@@ -33,6 +36,13 @@ export type Role = {
     _id?: string;
     description?: string;
     permissions?: string[];
+    createdAt?: string;
+    updatedAt?: string;
+}
+export type TypeActivity = {
+    _id?: string;
+    description?: string;
+    key?: string;
     createdAt?: string;
     updatedAt?: string;
 }

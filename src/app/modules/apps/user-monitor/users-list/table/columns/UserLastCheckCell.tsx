@@ -8,9 +8,10 @@ const UserLastCheckCell: FC<Props> = ({check}) => (
 
     <div className='d-flex flex-column'>
         <a href='#' className='text-gray-800 text-hover-primary mb-1'>
-            {check?.typeActivity?.description || ''}
+            {check?.typeActivity.description || ''}
         </a>
-        <span>            {transformDate(check?.typeActivity?.createdAt)} </span>
+        <span>            {transformDate(check?.createdAt)} </span>
+        {/*<span>            {check?.createdAt} </span>*/}
     </div>
 )
 

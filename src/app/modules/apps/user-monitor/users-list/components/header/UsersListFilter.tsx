@@ -3,8 +3,9 @@ import {MenuComponent} from '../../../../../../../_metronic/assets/ts/components
 import {initialQueryState, KTIcon} from '../../../../../../../_metronic/helpers'
 import {useQueryRequest} from '../../core/QueryRequestProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
-import {getRoles} from "../../core/_requestsUsers";
-import {Role} from "../../core/_models";
+import {getRoles, getTypeChecks} from "../../core/_requestsUsers";
+import {Role, TypeActivity} from "../../core/_models";
+import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
 
 const UsersListFilter = () => {
@@ -16,10 +17,15 @@ const UsersListFilter = () => {
     const {isLoading} = useQueryResponse()
     const [role, setRole] = useState<string | undefined>()
     const [roles, setRoles] = useState<Role[]>([]);
+    const [typeCheck, setTypeCheck] = useState<string | undefined>()
+    const [typeChecks, setTypeChecks] = useState<Role[]>([]);
 
     useEffect(() => {
         getRoles("").then((response: Role[]) => {
             setRoles(response); // Almacena el rol en un array para el estado
+        });
+        getTypeChecks("").then((response: TypeActivity[]) => {
+            setTypeChecks(response);
         });
     }, []);
 
@@ -32,10 +38,21 @@ const UsersListFilter = () => {
     }
 
     const filterData = () => {
+
+        const { endDate, startDate } = dateState;
+
+        // Crear objetos Date a partir de las fechas en formato "1997-03-16T00:00:00.000Z"
+        const formattedEndDate = new Date(endDate);
+        const formattedStartDate = new Date(startDate);
+
+        // Obtener cadenas de fecha en formato ISO 8601 con zona horaria UTC
+        const isoFormattedEndDate = formattedEndDate.toISOString();
+        const isoFormattedStartDate = formattedStartDate.toISOString();
+
         updateState({
-            filter: {role},
+            filter: { role, typeCheck, endDate: isoFormattedEndDate, startDate: isoFormattedStartDate },
             ...initialQueryState,
-        })
+        });
     }
 
     return (
@@ -96,7 +113,7 @@ const UsersListFilter = () => {
 
                     {/* begin::Input group */}
                     <div>
-                        {roles.length > 0 && (
+                        {typeChecks.length > 0 && (
                             <div className='mb-10'>
                                 <label className='form-label fs-6 fw-bold'>Type Check:</label>
                                 <select
@@ -106,14 +123,14 @@ const UsersListFilter = () => {
                                     data-allow-clear='true'
                                     data-kt-user-table-filter='typeCheck'
                                     data-hide-search='true'
-                                    onChange={(e) => setRole(e.target.value)}
-                                    value={role}
-                                    multiple={true}
+                                    onChange={(e) => setTypeCheck(e.target.value)}
+                                    value={typeCheck}
+                                    multiple={false}
                                 >
                                     <option value=''></option>
-                                    {roles.map((role) => (
-                                        <option key={role._id} value={role._id}>
-                                            {role.description}
+                                    {typeChecks.map((typeCheck) => (
+                                        <option key={typeCheck._id} value={typeCheck._id}>
+                                            {typeCheck.description}
                                         </option>
                                     ))}
                                 </select>
@@ -156,7 +173,7 @@ const UsersListFilter = () => {
                         <button
                             type='button'
                             disabled={isLoading}
-                            onClick={filterData}
+                            onClick={resetData}
                             className='btn btn-light btn-active-light-primary fw-bold me-2 px-6'
                             data-kt-menu-dismiss='true'
                             data-kt-user-table-filter='reset'
@@ -166,7 +183,7 @@ const UsersListFilter = () => {
                         <button
                             disabled={isLoading}
                             type='button'
-                            onClick={resetData}
+                            onClick={filterData}
                             className='btn btn-primary fw-bold px-6'
                             data-kt-menu-dismiss='true'
                             data-kt-user-table-filter='filter'

@@ -12,6 +12,7 @@ const UsersListHeader = () => {
       <div className='card-toolbar'>
         {/* begin::Group actions */}
         {selected.length > 0 ? <UsersListGrouping /> : <UsersListToolbar />}
+
         {/* end::Group actions */}
       </div>
       {/* end::Card toolbar */}
