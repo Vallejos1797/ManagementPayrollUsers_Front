@@ -7,6 +7,9 @@ export type User = {
     password?: string
     person?: any
     role?: any
+    company?: any
+    department?: any
+    office?: any
     // Person information
 
     firstName?: string
@@ -35,6 +38,26 @@ export type Role = {
     permissions?: string[];
     createdAt?: string;
     updatedAt?: string;
+}
+
+export type Company = {
+    _id?: string;
+    description?: string;
+    departments?: any;
+    createdAt?: string;
+}
+
+export type Department = {
+    _id?: string;
+    description?: string;
+    offices?: any;
+    createdAt?: string;
+}
+
+export type Office = {
+    _id?: string;
+    description?: string;
+    createdAt?: string;
 }
 
 export type Person = {

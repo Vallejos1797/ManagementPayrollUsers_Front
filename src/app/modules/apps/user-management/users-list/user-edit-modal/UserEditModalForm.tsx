@@ -2,14 +2,26 @@ import {FC, useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {initialUser, Person, Role, User} from '../core/_models'
+import {Company, Department, initialUser, Office, Person, Role, User} from '../core/_models'
 import clsx from 'clsx'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser, getRoles, createPerson, updateUser, updatePerson} from '../core/_requestsUsers'
+import
+{
+    createUser,
+    getRoles,
+    createPerson,
+    updateUser,
+    updatePerson,
+    getCompanies,
+    addedUserToOffice,
+    updateUserToOffice
+}
+    from '../core/_requestsUsers'
 import {useQueryResponse} from '../core/QueryResponseProvider'
 import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
+import {useAuth} from "../../../../auth";
 
 type Props = {
     isUserLoading: boolean
@@ -52,9 +64,15 @@ const editUserSchema = Yup.object().shape({
 })
 
 const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
+    const {currentUser} = useAuth()
     const {setItemIdForUpdate} = useListView()
     const {refetch} = useQueryResponse()
     const [roles, setRoles] = useState<Role[]>([]);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [showDepartmentsSelect, setShowDepartmentsSelect] = useState(false);
+    const [offices, setOffices] = useState<Office[]>([]);
+    const [showOfficesSelect, setShowOfficesSelect] = useState(false);
 
 
     useEffect(() => {
@@ -62,12 +80,23 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             setRoles(response); // Almacena el rol en un array para el estado
         });
     }, []);
+
+    useEffect(() => {
+        getCompanies("").then((response: Role[]) => {
+            setCompanies(response);
+        });
+    }, []);
+
+
     const [userForEdit, setFormEdit] = useState<User>({
         ...user,
         username: user.username || "",
         email: user.email || "",
         password: '',
         role: user.role ? user.role._id : "",
+        company: user.company ? currentUser?.auth?.company._id : "",
+        department: user.department ? user.department._id : "",
+        office: user?.office ? user.office._id : "",
 
         // Person information
         firstName: user.person ? user.person.firstName : "",
@@ -101,6 +130,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         initialValues: userForEdit,
         validationSchema: editUserSchema,
         onSubmit: async (values, {setSubmitting}) => {
+            console.log('llega-->', values)
             const person: Person = {
                 firstName: values.firstName,
                 lastName: values.lastName,
@@ -109,7 +139,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                 direction: values.direction,
                 birthday: transformDate(values.birthday || ""),
             }
-            const user: any = {
+            let user: any = {
                 username: values.username,
                 email: values.email,
                 password: values.password,
@@ -117,6 +147,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             }
             setSubmitting(true)
             try {
+                // Update
                 if (isNotEmpty(values._id)) {
                     person._id = userForEdit.person._id
                     await updatePerson(person).then(() => {
@@ -124,11 +155,25 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
 
                     await updateUser(values).then(() => {
                     })
-                } else {
+                    await updateUserToOffice({
+                        idUser: values._id,
+                        idOffice: values.office
+                    }).then(() => {
+                    })
+                }
+                // Create User
+                else {
                     await createPerson(person).then(data => {
                         user.personId = data._id
                     })
-                    await createUser(user).then(() => {
+                    await createUser(user).then((newUser) => {
+                        user = {...user, ...newUser}
+                    })
+                    await addedUserToOffice({
+                        idUser: user.id,
+                        idOffice: values.office
+                    }).then((office) => {
+                        console.log('funciono', office)
                     })
 
                 }
@@ -140,6 +185,22 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             }
         },
     })
+
+
+    const handleCompanyChange = (companyId: string) => {
+        const company = companies.find(company => companyId == company._id)
+        setDepartments(company?.departments)
+        companyId ? setShowDepartmentsSelect(true) : setShowDepartmentsSelect(false)
+    };
+
+    const handleDepartmentChange = (departmentId: string) => {
+        console.log('llega..', departmentId)
+        const department = departments.find(department => departmentId == department._id)
+        console.log('departements', department)
+        setOffices(department?.offices)
+        departmentId ? setShowOfficesSelect(true) : setShowOfficesSelect(false)
+    };
+
 
     return (
         <>
@@ -575,6 +636,80 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         {/* end::Input row */}
                     </div>
                     {/* end::Input group */}
+
+
+                    <div className='fv-row mb-7'>
+                        {/* begin::Label */}
+                        <label className=' fw-bold fs-6 mb-2'>Company</label>
+                        {/* end::Label */}
+                        <select
+                            name='company'
+                            aria-label='Select a Timezone'
+                            data-control='select2'
+                            data-placeholder='date_period'
+                            onChange={(e) => {
+                                formik.handleChange(e);
+                                handleCompanyChange(e.target.value);
+                            }}
+                            className='form-select form-select-sm form-select-solid'
+                        >
+                            <option value=''>Select</option>
+                            {companies.length > 0 && (
+                                companies.map((company) => (
+                                    <option key={company._id} value={company._id}>{company.description}</option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+                    <div className='fv-row mb-7'>
+                        {showDepartmentsSelect && departments && (
+                            <div>
+                                <label className=' fw-bold fs-6 mb-2'>Department</label>
+                                <select
+                                    name='department'
+                                    onChange={(e) => {
+                                        formik.handleChange(e);
+                                        handleDepartmentChange(e.target.value);
+                                    }}
+                                    className='form-select form-select-sm form-select-solid'
+                                >
+                                    <option value=''>Select department</option>
+                                    {departments.map((department) => (
+                                        <option key={department._id} value={department._id}>
+                                            {department.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                        )}
+                    </div>
+                    <div className='fv-row mb-7'>
+                        {showOfficesSelect && offices && (
+                            <div>
+                                <label className=' fw-bold fs-6 mb-2'>Office</label>
+                                <select
+                                    name='office'
+                                    onChange={(e) => {
+                                        formik.handleChange(e);
+                                    }}
+                                    className='form-select form-select-sm form-select-solid'
+                                >
+                                    <option value=''>Select office</option>
+                                    {offices.map((office) => (
+                                        <option key={office._id} value={office._id}>
+                                            {office.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                        )}
+                    </div>
+
+
+                    {/* end::Input */}
+
                 </div>
                 {/* end::Scroll */}
 
