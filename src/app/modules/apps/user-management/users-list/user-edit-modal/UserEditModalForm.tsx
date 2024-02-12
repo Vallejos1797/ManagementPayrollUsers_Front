@@ -21,7 +21,6 @@ import
 import {useQueryResponse} from '../core/QueryResponseProvider'
 import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
-import {useAuth} from "../../../../auth";
 
 type Props = {
     isUserLoading: boolean
@@ -64,7 +63,6 @@ const editUserSchema = Yup.object().shape({
 })
 
 const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
-    const {currentUser} = useAuth()
     const {setItemIdForUpdate} = useListView()
     const {refetch} = useQueryResponse()
     const [roles, setRoles] = useState<Role[]>([]);
@@ -73,30 +71,15 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
     const [showDepartmentsSelect, setShowDepartmentsSelect] = useState(false);
     const [offices, setOffices] = useState<Office[]>([]);
     const [showOfficesSelect, setShowOfficesSelect] = useState(false);
-
-
-    useEffect(() => {
-        getRoles("").then((response: Role[]) => {
-            setRoles(response); // Almacena el rol en un array para el estado
-        });
-    }, []);
-
-    useEffect(() => {
-        getCompanies("").then((response: Role[]) => {
-            setCompanies(response);
-        });
-    }, []);
-
-
     const [userForEdit, setFormEdit] = useState<User>({
         ...user,
         username: user.username || "",
         email: user.email || "",
         password: '',
         role: user.role ? user.role._id : "",
-        company: user.company ? currentUser?.auth?.company._id : "",
+        company: user.company ? user?.company._id : "",
         department: user.department ? user.department._id : "",
-        office: user?.office ? user.office._id : "",
+        office: user.office ? user.office._id : "",
 
         // Person information
         firstName: user.person ? user.person.firstName : "",
@@ -111,6 +94,33 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         avatar: user.avatar || initialUser.avatar,
         position: user.position || initialUser.position,
     })
+
+    useEffect(() => {
+        console.log('trae-->', user.department._id)
+
+
+        getRoles("").then((response: Role[]) => {
+            setRoles(response); // Almacena el rol en un array para el estado
+        });
+    }, []);
+
+    useEffect(() => {
+        getCompanies("").then((response: Role[]) => {
+            setCompanies(response);
+
+        });
+    }, []);
+    useEffect(() => {
+        if (user?.company._id && companies.length > 0) {
+            handleCompanyChange(user?.company._id)
+        }
+
+    }, [companies])
+    useEffect(() => {
+        if (user?.department._id) {
+            handleDepartmentChange(user?.department._id)
+        }
+    }, [departments])
 
 
     const cancel = (withRefresh?: boolean) => {
@@ -189,14 +199,17 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
 
     const handleCompanyChange = (companyId: string) => {
         const company = companies.find(company => companyId == company._id)
+        console.log('companies', companies)
+        console.log('encontro departments', company?.departments)
         setDepartments(company?.departments)
         companyId ? setShowDepartmentsSelect(true) : setShowDepartmentsSelect(false)
     };
 
     const handleDepartmentChange = (departmentId: string) => {
-        console.log('llega..', departmentId)
         const department = departments.find(department => departmentId == department._id)
-        console.log('departements', department)
+        console.log('departments', departments)
+
+        console.log('encontro offices', department?.offices)
         setOffices(department?.offices)
         departmentId ? setShowOfficesSelect(true) : setShowOfficesSelect(false)
     };
@@ -643,10 +656,10 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         <label className=' fw-bold fs-6 mb-2'>Company</label>
                         {/* end::Label */}
                         <select
+                            {...formik.getFieldProps('company')}
+
                             name='company'
-                            aria-label='Select a Timezone'
                             data-control='select2'
-                            data-placeholder='date_period'
                             onChange={(e) => {
                                 formik.handleChange(e);
                                 handleCompanyChange(e.target.value);
@@ -666,6 +679,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                             <div>
                                 <label className=' fw-bold fs-6 mb-2'>Department</label>
                                 <select
+                                    {...formik.getFieldProps('department')}
                                     name='department'
                                     onChange={(e) => {
                                         formik.handleChange(e);
@@ -689,6 +703,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                             <div>
                                 <label className=' fw-bold fs-6 mb-2'>Office</label>
                                 <select
+                                    {...formik.getFieldProps('office')}
                                     name='office'
                                     onChange={(e) => {
                                         formik.handleChange(e);
