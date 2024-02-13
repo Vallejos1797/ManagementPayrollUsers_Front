@@ -27,41 +27,45 @@ type Props = {
     user: User
 }
 
-const editUserSchema = Yup.object().shape({
-    username: Yup.string()
-        .min(6, 'Minimum 6 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Name is required'),
-    email: Yup.string()
-        .email('Wrong email format')
-        .min(6, 'Minimum 6 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Email is required'),
-    password: Yup.string()
-        .min(8, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Password is required'),
-    firstName: Yup.string()
-        .min(3, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    lastName: Yup.string()
-        .min(3, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    identity: Yup.string()
-        .min(10, 'Minimum 10 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    phone: Yup.string()
-        .min(10, 'Minimum 10 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    direction: Yup.string()
-        .min(10, 'Minimum 10 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    role: Yup.string()
-        .required('Role is required'),
-
-
-})
-
+const userSchema = (user) => {
+    return  Yup.object().shape({
+        username: Yup.string()
+            .min(6, 'Minimum 6 symbols')
+            .max(50, 'Maximum 50 symbols')
+            .required('Name is required'),
+        email: Yup.string()
+            .email('Wrong email format')
+            .min(6, 'Minimum 6 symbols')
+            .max(50, 'Maximum 50 symbols')
+            .required('Email is required'),
+        password:
+            user
+                ? Yup.string()
+                    .min(8, 'Minimum 3 symbols')
+                    .max(50, 'Maximum 50 symbols')
+                : Yup.string()
+                    .min(8, 'Minimum 3 symbols')
+                    .max(50, 'Maximum 50 symbols')
+                    .required('Password is required'),
+        firstName: Yup.string()
+            .min(3, 'Minimum 3 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        lastName: Yup.string()
+            .min(3, 'Minimum 3 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        identity: Yup.string()
+            .min(10, 'Minimum 10 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        phone: Yup.string()
+            .min(10, 'Minimum 10 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        direction: Yup.string()
+            .min(10, 'Minimum 10 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        role: Yup.string()
+            .required('Role is required'),
+    });
+};
 const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
     const {setItemIdForUpdate} = useListView()
     const {refetch} = useQueryResponse()
@@ -96,9 +100,6 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
     })
 
     useEffect(() => {
-        console.log('trae-->', user.department._id)
-
-
         getRoles("").then((response: Role[]) => {
             setRoles(response); // Almacena el rol en un array para el estado
         });
@@ -138,7 +139,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
 
     const formik = useFormik({
         initialValues: userForEdit,
-        validationSchema: editUserSchema,
+        validationSchema: userSchema(user),
         onSubmit: async (values, {setSubmitting}) => {
             console.log('llega-->', values)
             const person: Person = {
