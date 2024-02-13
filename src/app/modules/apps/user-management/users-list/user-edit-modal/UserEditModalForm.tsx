@@ -28,7 +28,9 @@ type Props = {
 }
 
 const userSchema = (user) => {
-    return  Yup.object().shape({
+    console.log('user', user._id)
+    console.log('user', user._id)
+    return Yup.object().shape({
         username: Yup.string()
             .min(6, 'Minimum 6 symbols')
             .max(50, 'Maximum 50 symbols')
@@ -39,7 +41,7 @@ const userSchema = (user) => {
             .max(50, 'Maximum 50 symbols')
             .required('Email is required'),
         password:
-            user
+            user._id
                 ? Yup.string()
                     .min(8, 'Minimum 3 symbols')
                     .max(50, 'Maximum 50 symbols')
@@ -112,14 +114,14 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         });
     }, []);
     useEffect(() => {
-        if (user?.company._id && companies.length > 0) {
-            handleCompanyChange(user?.company._id)
+        if (user?.company?._id && companies?.length > 0) {
+            handleCompanyChange(user?.company?._id)
         }
 
     }, [companies])
     useEffect(() => {
-        if (user?.department._id) {
-            handleDepartmentChange(user?.department._id)
+        if (user?.department?._id) {
+            handleDepartmentChange(user?.department?._id)
         }
     }, [departments])
 
@@ -141,7 +143,6 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         initialValues: userForEdit,
         validationSchema: userSchema(user),
         onSubmit: async (values, {setSubmitting}) => {
-            console.log('llega-->', values)
             const person: Person = {
                 firstName: values.firstName,
                 lastName: values.lastName,
@@ -200,17 +201,12 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
 
     const handleCompanyChange = (companyId: string) => {
         const company = companies.find(company => companyId == company._id)
-        console.log('companies', companies)
-        console.log('encontro departments', company?.departments)
         setDepartments(company?.departments)
         companyId ? setShowDepartmentsSelect(true) : setShowDepartmentsSelect(false)
     };
 
     const handleDepartmentChange = (departmentId: string) => {
         const department = departments.find(department => departmentId == department._id)
-        console.log('departments', departments)
-
-        console.log('encontro offices', department?.offices)
         setOffices(department?.offices)
         departmentId ? setShowOfficesSelect(true) : setShowOfficesSelect(false)
     };
@@ -344,8 +340,13 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                                     'is-valid': formik.touched.email && !formik.errors.email,
                                 }
                             )}
+
                             type='email'
                             name='email'
+                            onChange={(e) => {
+                                e.target.value = e.target.value.toLowerCase(); // Convierte el valor a minúsculas
+                                formik.handleChange(e);
+                            }}
                             autoComplete='off'
                             disabled={formik.isSubmitting || isUserLoading}
                         />
