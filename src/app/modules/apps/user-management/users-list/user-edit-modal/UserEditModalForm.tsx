@@ -2,11 +2,22 @@ import {FC, useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {isNotEmpty, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
-import {initialUser, Person, Role, User} from '../core/_models'
+import {Company, Department, initialUser, Office, Person, Role, User} from '../core/_models'
 import clsx from 'clsx'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser, getRoles, createPerson, updateUser, updatePerson} from '../core/_requestsUsers'
+import
+{
+    createUser,
+    getRoles,
+    createPerson,
+    updateUser,
+    updatePerson,
+    getCompanies,
+    addedUserToOffice,
+    updateUserToOffice
+}
+    from '../core/_requestsUsers'
 import {useQueryResponse} from '../core/QueryResponseProvider'
 import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
@@ -16,58 +27,65 @@ type Props = {
     user: User
 }
 
-const editUserSchema = Yup.object().shape({
-    username: Yup.string()
-        .min(6, 'Minimum 6 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Name is required'),
-    email: Yup.string()
-        .email('Wrong email format')
-        .min(6, 'Minimum 6 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Email is required'),
-    password: Yup.string()
-        .min(8, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols')
-        .required('Password is required'),
-    firstName: Yup.string()
-        .min(3, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    lastName: Yup.string()
-        .min(3, 'Minimum 3 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    identity: Yup.string()
-        .min(10, 'Minimum 10 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    phone: Yup.string()
-        .min(10, 'Minimum 10 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    direction: Yup.string()
-        .min(10, 'Minimum 10 symbols')
-        .max(50, 'Maximum 50 symbols'),
-    role: Yup.string()
-        .required('Role is required'),
-
-
-})
-
+const userSchema = (user) => {
+    console.log('user', user._id)
+    console.log('user', user._id)
+    return Yup.object().shape({
+        username: Yup.string()
+            .min(6, 'Minimum 6 symbols')
+            .max(50, 'Maximum 50 symbols')
+            .required('Name is required'),
+        email: Yup.string()
+            .email('Wrong email format')
+            .min(6, 'Minimum 6 symbols')
+            .max(50, 'Maximum 50 symbols')
+            .required('Email is required'),
+        password:
+            user._id
+                ? Yup.string()
+                    .min(8, 'Minimum 3 symbols')
+                    .max(50, 'Maximum 50 symbols')
+                : Yup.string()
+                    .min(8, 'Minimum 3 symbols')
+                    .max(50, 'Maximum 50 symbols')
+                    .required('Password is required'),
+        firstName: Yup.string()
+            .min(3, 'Minimum 3 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        lastName: Yup.string()
+            .min(3, 'Minimum 3 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        identity: Yup.string()
+            .min(10, 'Minimum 10 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        phone: Yup.string()
+            .min(10, 'Minimum 10 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        direction: Yup.string()
+            .min(10, 'Minimum 10 symbols')
+            .max(50, 'Maximum 50 symbols'),
+        role: Yup.string()
+            .required('Role is required'),
+    });
+};
 const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
     const {setItemIdForUpdate} = useListView()
     const {refetch} = useQueryResponse()
     const [roles, setRoles] = useState<Role[]>([]);
-
-
-    useEffect(() => {
-        getRoles("").then((response: Role[]) => {
-            setRoles(response); // Almacena el rol en un array para el estado
-        });
-    }, []);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [showDepartmentsSelect, setShowDepartmentsSelect] = useState(false);
+    const [offices, setOffices] = useState<Office[]>([]);
+    const [showOfficesSelect, setShowOfficesSelect] = useState(false);
     const [userForEdit, setFormEdit] = useState<User>({
         ...user,
         username: user.username || "",
         email: user.email || "",
         password: '',
         role: user.role ? user.role._id : "",
+        company: user.company ? user?.company._id : "",
+        department: user.department ? user.department._id : "",
+        office: user.office ? user.office._id : "",
 
         // Person information
         firstName: user.person ? user.person.firstName : "",
@@ -82,6 +100,30 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
         avatar: user.avatar || initialUser.avatar,
         position: user.position || initialUser.position,
     })
+
+    useEffect(() => {
+        getRoles("").then((response: Role[]) => {
+            setRoles(response); // Almacena el rol en un array para el estado
+        });
+    }, []);
+
+    useEffect(() => {
+        getCompanies("").then((response: Role[]) => {
+            setCompanies(response);
+
+        });
+    }, []);
+    useEffect(() => {
+        if (user?.company?._id && companies?.length > 0) {
+            handleCompanyChange(user?.company?._id)
+        }
+
+    }, [companies])
+    useEffect(() => {
+        if (user?.department?._id) {
+            handleDepartmentChange(user?.department?._id)
+        }
+    }, [departments])
 
 
     const cancel = (withRefresh?: boolean) => {
@@ -99,7 +141,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
 
     const formik = useFormik({
         initialValues: userForEdit,
-        validationSchema: editUserSchema,
+        validationSchema: userSchema(user),
         onSubmit: async (values, {setSubmitting}) => {
             const person: Person = {
                 firstName: values.firstName,
@@ -109,7 +151,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                 direction: values.direction,
                 birthday: transformDate(values.birthday || ""),
             }
-            const user: any = {
+            let user: any = {
                 username: values.username,
                 email: values.email,
                 password: values.password,
@@ -117,6 +159,7 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             }
             setSubmitting(true)
             try {
+                // Update
                 if (isNotEmpty(values._id)) {
                     person._id = userForEdit.person._id
                     await updatePerson(person).then(() => {
@@ -124,11 +167,25 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
 
                     await updateUser(values).then(() => {
                     })
-                } else {
+                    await updateUserToOffice({
+                        idUser: values._id,
+                        idOffice: values.office
+                    }).then(() => {
+                    })
+                }
+                // Create User
+                else {
                     await createPerson(person).then(data => {
                         user.personId = data._id
                     })
-                    await createUser(user).then(() => {
+                    await createUser(user).then((newUser) => {
+                        user = {...user, ...newUser}
+                    })
+                    await addedUserToOffice({
+                        idUser: user.id,
+                        idOffice: values.office
+                    }).then((office) => {
+                        console.log('funciono', office)
                     })
 
                 }
@@ -140,6 +197,20 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
             }
         },
     })
+
+
+    const handleCompanyChange = (companyId: string) => {
+        const company = companies.find(company => companyId == company._id)
+        setDepartments(company?.departments)
+        companyId ? setShowDepartmentsSelect(true) : setShowDepartmentsSelect(false)
+    };
+
+    const handleDepartmentChange = (departmentId: string) => {
+        const department = departments.find(department => departmentId == department._id)
+        setOffices(department?.offices)
+        departmentId ? setShowOfficesSelect(true) : setShowOfficesSelect(false)
+    };
+
 
     return (
         <>
@@ -269,8 +340,13 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                                     'is-valid': formik.touched.email && !formik.errors.email,
                                 }
                             )}
+
                             type='email'
                             name='email'
+                            onChange={(e) => {
+                                e.target.value = e.target.value.toLowerCase(); // Convierte el valor a minúsculas
+                                formik.handleChange(e);
+                            }}
                             autoComplete='off'
                             disabled={formik.isSubmitting || isUserLoading}
                         />
@@ -575,6 +651,82 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
                         {/* end::Input row */}
                     </div>
                     {/* end::Input group */}
+
+
+                    <div className='fv-row mb-7'>
+                        {/* begin::Label */}
+                        <label className=' fw-bold fs-6 mb-2'>Company</label>
+                        {/* end::Label */}
+                        <select
+                            {...formik.getFieldProps('company')}
+
+                            name='company'
+                            data-control='select2'
+                            onChange={(e) => {
+                                formik.handleChange(e);
+                                handleCompanyChange(e.target.value);
+                            }}
+                            className='form-select form-select-sm form-select-solid'
+                        >
+                            <option value=''>Select</option>
+                            {companies.length > 0 && (
+                                companies.map((company) => (
+                                    <option key={company._id} value={company._id}>{company.description}</option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+                    <div className='fv-row mb-7'>
+                        {showDepartmentsSelect && departments && (
+                            <div>
+                                <label className=' fw-bold fs-6 mb-2'>Department</label>
+                                <select
+                                    {...formik.getFieldProps('department')}
+                                    name='department'
+                                    onChange={(e) => {
+                                        formik.handleChange(e);
+                                        handleDepartmentChange(e.target.value);
+                                    }}
+                                    className='form-select form-select-sm form-select-solid'
+                                >
+                                    <option value=''>Select department</option>
+                                    {departments.map((department) => (
+                                        <option key={department._id} value={department._id}>
+                                            {department.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                        )}
+                    </div>
+                    <div className='fv-row mb-7'>
+                        {showOfficesSelect && offices && (
+                            <div>
+                                <label className=' fw-bold fs-6 mb-2'>Office</label>
+                                <select
+                                    {...formik.getFieldProps('office')}
+                                    name='office'
+                                    onChange={(e) => {
+                                        formik.handleChange(e);
+                                    }}
+                                    className='form-select form-select-sm form-select-solid'
+                                >
+                                    <option value=''>Select office</option>
+                                    {offices.map((office) => (
+                                        <option key={office._id} value={office._id}>
+                                            {office.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                        )}
+                    </div>
+
+
+                    {/* end::Input */}
+
                 </div>
                 {/* end::Scroll */}
 

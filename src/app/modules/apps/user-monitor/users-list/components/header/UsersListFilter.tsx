@@ -5,15 +5,23 @@ import {useQueryRequest} from '../../core/QueryRequestProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
 import {getRoles, getTypeChecks} from "../../core/_requestsUsers";
 import {Role, TypeActivity} from "../../core/_models";
-import "flatpickr/dist/themes/material_green.css";
-import Flatpickr from "react-flatpickr";
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+// Función para obtener el primer día del mes actual
+const getFirstDayOfMonth = () => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
+};
 
+// Función para obtener el último día del mes actual
+const getLastDayOfMonth = () => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth() + 1, 0);
+};
 const UsersListFilter = () => {
-    const [dateState, setDateState] = useState<any>({
-        startDate: new Date(),
-        endDate: new Date()
-    });
-    const {updateState} = useQueryRequest()
+    const [dateRange, setDateRange] = useState([getFirstDayOfMonth(), getLastDayOfMonth()]);
+    const [startDate, endDate] = dateRange;
+       const {updateState} = useQueryRequest()
     const {isLoading} = useQueryResponse()
     const [role, setRole] = useState<string | undefined>()
     const [roles, setRoles] = useState<Role[]>([]);
@@ -36,27 +44,43 @@ const UsersListFilter = () => {
     const resetData = () => {
         updateState({filter: undefined, ...initialQueryState})
     }
+    useEffect(() => {
+        filterData()
+    }, [dateRange]);
+
+
 
     const filterData = () => {
-
-        const { endDate, startDate } = dateState;
-
-        // Crear objetos Date a partir de las fechas en formato "1997-03-16T00:00:00.000Z"
-        const formattedEndDate = new Date(endDate);
-        const formattedStartDate = new Date(startDate);
-
-        // Obtener cadenas de fecha en formato ISO 8601 con zona horaria UTC
+        const formattedStartDate =new Date(dateRange[0]);
+        const formattedEndDate = new Date(dateRange[1]);
         const isoFormattedEndDate = formattedEndDate.toISOString();
         const isoFormattedStartDate = formattedStartDate.toISOString();
-
         updateState({
-            filter: { role, typeCheck, endDate: isoFormattedEndDate, startDate: isoFormattedStartDate },
+            filter: {role, typeCheck, endDate: isoFormattedEndDate, startDate: isoFormattedStartDate},
             ...initialQueryState,
         });
     }
 
+
     return (
         <>
+            <div className='m-2'>
+                <DatePicker
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(update) => {
+                        setDateRange(update);
+                    }}
+                    placeholderText="Selected date"
+                    isClearable={true}
+                    className='form-control'
+                    dateFormat="dd/MM/yyyy"
+                    yearDropdownItemNumber={15}
+                    selectsRange={true}
+                    showYearDropdown
+                    scrollableYearDropdown
+                />
+            </div>
             {/* begin::Filter Button */}
             <button
                 disabled={isLoading}
@@ -72,7 +96,9 @@ const UsersListFilter = () => {
             {/* begin::SubMenu */}
             <div className='menu menu-sub menu-sub-dropdown w-300px w-md-325px' data-kt-menu='true'>
                 {/* begin::Header */}
+
                 <div className='px-7 py-5'>
+
                     <div className='fs-5 text-dark fw-bolder'>Filter Options</div>
                 </div>
                 {/* end::Header */}
@@ -109,8 +135,6 @@ const UsersListFilter = () => {
                         )}
                     </div>
                     {/* end::Input group */}
-
-
                     {/* begin::Input group */}
                     <div>
                         {typeChecks.length > 0 && (
@@ -134,34 +158,6 @@ const UsersListFilter = () => {
                                         </option>
                                     ))}
                                 </select>
-                            </div>
-                        )}
-                    </div>
-                    {/* end::Input group */}
-
-                    {/* begin::Input group */}
-                    <div>
-                        {roles.length > 0 && (
-                            <div className='mb-10'>
-                                <div>
-                                    {roles.length > 0 && (
-                                        <div className='mb-10'>
-                                            <label className='form-label fs-6 fw-bold'>Range Date:</label>
-
-                                            <Flatpickr
-                                                value={dateState.date}
-                                                onChange={([startDate, endDate]) => {
-                                                    setDateState({startDate, endDate});
-                                                }}
-                                                options={{
-                                                    mode: "range",
-                                                }}
-                                                className='form-control form-control-solid'
-                                                placeholder='Pick date'
-                                            />
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                         )}
                     </div>

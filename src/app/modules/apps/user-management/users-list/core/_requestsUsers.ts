@@ -1,11 +1,13 @@
 import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../../_metronic/helpers'
-import {Person, Role, User, UsersQueryResponse} from './_models'
+import {Person, Role, User, UsersQueryResponse,Company} from './_models'
 
 const API_URL = process.env.REACT_APP_THEME_API_URL
 const USER_URL = `${API_URL}/management/users`
 const ROLES_URL = `${API_URL}/management/roles`
+const COMPANIES_URL = `${API_URL}/management/companies`
 const PERSON_URL = `${API_URL}/management/persons`
+const USER_TO_OFFICE = `${API_URL}/management/userToOffice`
 
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {
@@ -60,14 +62,30 @@ const getRoles = (query: string): Promise<Role[]> => {
         })
 }
 
+const getCompanies = (query: string): Promise<Company[]> => {
+    return axios
+        .get(`${COMPANIES_URL}?${query}`)
+        .then((d: AxiosResponse<Company[]>) => {
+            return d.data
+        })
+}
+
+const addedUserToOffice = (payload: any): Promise<any | undefined> => {
+    return axios
+        .post(USER_TO_OFFICE, payload)
+        .then((response: AxiosResponse<Response<any>>) => response.data)
+}
+
+const updateUserToOffice = (payload: any): Promise<any | undefined> => {
+    return axios
+        .put(USER_TO_OFFICE, payload)
+        .then((response: AxiosResponse<Response<any>>) => response.data)
+}
 
 const createPerson = (person: any): Promise<any | undefined> => {
-    console.log('va crear person', person)
-
     return axios
         .post(PERSON_URL, person)
         .then((response: AxiosResponse<Response<any>>) => {
-            console.log("trajo", response)
             return response.data
         })
 
@@ -80,4 +98,17 @@ const updatePerson = (person: Person): Promise<any | undefined> => {
         .then((response: Response<User>) => response)
 }
 
-export {getUsers, deleteUser, deleteSelectedUsers, getUserById, createUser, updateUser, getRoles, createPerson,updatePerson}
+export {
+    getUsers,
+    deleteUser,
+    deleteSelectedUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    getRoles,
+    createPerson,
+    updatePerson,
+    getCompanies,
+    addedUserToOffice,
+    updateUserToOffice
+}
